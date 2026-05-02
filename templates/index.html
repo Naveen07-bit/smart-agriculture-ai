@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Agriculture AI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --green-50: #eaf3de;
+    --green-200: #97c459;
+    --green-400: #639922;
+    --green-600: #3b6d11;
+    --green-800: #27500a;
+    --amber-50: #faeeda;
+    --amber-200: #ef9f27;
+    --amber-600: #854f0b;
+    --teal-50: #e1f5ee;
+    --teal-200: #5dcaa5;
+    --teal-400: #1d9e75;
+    --teal-600: #0f6e56;
+    --gray-100: #f1efe8;
+    --gray-200: #d8d5cb;
+    --text: #22241f;
+    --text-soft: #686b62;
+    --text-faint: #90938a;
+    --border: #ddd9ce;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow: 0 18px 45px rgba(39, 80, 10, 0.12);
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Outfit", sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(93, 202, 165, 0.2), transparent 28rem),
+        linear-gradient(180deg, #f9f7f0 0%, #eeeae0 100%);
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+.app {
+    width: min(860px, 100%);
+    margin: 0 auto;
+    padding-bottom: 2rem;
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: 2rem 2rem 1.55rem;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    background: linear-gradient(135deg, var(--green-800), var(--teal-600) 62%, var(--green-600));
+    box-shadow: var(--shadow);
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 82% 14%, rgba(255,255,255,0.16), transparent 12rem),
+        repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255,255,255,0.045) 30px, rgba(255,255,255,0.045) 31px);
+}
+
+.hero > * {
+    position: relative;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.hero-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.84);
+}
+
+.hero h1 {
+    max-width: 620px;
+    margin-bottom: 7px;
+    font-family: "DM Serif Display", serif;
+    font-size: clamp(34px, 7vw, 54px);
+    font-weight: 400;
+    line-height: 1.04;
+    color: #fff;
+}
+
+.hero h1 em {
+    color: #a8e6c0;
+}
+
+.hero p {
+    max-width: 620px;
+    color: rgba(255,255,255,0.76);
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.6;
+}
+
+.hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+}
+
+.hero-stat .num {
+    font-family: "DM Mono", monospace;
+    font-size: 20px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.hero-stat .lbl {
+    margin-top: 2px;
+    color: rgba(255,255,255,0.62);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.main {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.section-label {
+    margin-bottom: 0.6rem;
+    color: var(--text-faint);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.card {
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,0.78);
+    box-shadow: 0 12px 28px rgba(39, 80, 10, 0.06);
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.field,
+.slider-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label {
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+select,
+input[list] {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    outline: none;
+    color: var(--text);
+    background: #fff;
+}
+
+.divider {
+    height: 1px;
+    margin: 1rem 0;
+    background: var(--border);
+}
+
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--green-600);
+}
+
+.slider-val {
+    min-width: 54px;
+    text-align: right;
+    color: var(--text);
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+}
+
+.run-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 13px;
+    border: none;
+    border-radius: var(--radius-md);
+    color: #fff;
+    background: var(--green-600);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.run-btn:hover {
+    background: var(--green-800);
+}
+
+.top-crop {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid var(--green-200);
+    border-radius: var(--radius-lg);
+    background: var(--green-50);
+}
+
+.top-crop-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--green-600);
+    font-family: "DM Serif Display", serif;
+    font-size: 25px;
+}
+
+.top-crop-info {
+    flex: 1;
+}
+
+.top-crop-tag {
+    color: var(--green-600);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.top-crop-name {
+    color: var(--green-800);
+    font-family: "DM Serif Display", serif;
+    font-size: 30px;
+}
+
+.top-crop-score {
+    color: var(--green-600);
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+}
+
+.confidence-bar {
+    height: 6px;
+    margin-top: 7px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgba(59,109,17,0.15);
+}
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--green-400);
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.metric {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--gray-100);
+}
+
+.metric .m-label {
+    color: var(--text-faint);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.metric .m-value {
+    margin-top: 2px;
+    font-family: "DM Mono", monospace;
+    font-size: 18px;
+}
+
+.metric .m-unit {
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
+.tab-row {
+    display: flex;
+    gap: 4px;
+    margin: 1rem 0;
+    overflow-x: auto;
+}
+
+.tab {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-soft);
+    background: transparent;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.tab.active {
+    border-color: var(--green-600);
+    color: #fff;
+    background: var(--green-600);
+    font-weight: 600;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.crop-rankings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.crop-rank {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.76);
+}
+
+.rank-num {
+    width: 24px;
+    color: var(--text-faint);
+    text-align: center;
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+}
+
+.rank-icon {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--green-600);
+    font-family: "DM Serif Display", serif;
+}
+
+.rank-info {
+    flex: 1;
+}
+
+.rank-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.rank-why {
+    color: var(--text-soft);
+    font-size: 12px;
+}
+
+.rank-bar-wrap {
+    width: 86px;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--gray-200);
+}
+
+.rank-bar {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.rank-score {
+    min-width: 42px;
+    color: var(--text-soft);
+    text-align: right;
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+}
+
+.profit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.profit-card {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+}
+
+.profit-card.good {
+    background: var(--green-50);
+}
+
+.profit-card.warn {
+    background: var(--amber-50);
+}
+
+.profit-card .p-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.profit-card.good .p-label,
+.profit-card.good .p-val {
+    color: var(--green-800);
+}
+
+.profit-card.warn .p-label,
+.profit-card.warn .p-val {
+    color: var(--amber-600);
+}
+
+.profit-card .p-val {
+    margin-top: 2px;
+    font-family: "DM Mono", monospace;
+    font-size: 20px;
+}
+
+.profit-card .p-note {
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
+.chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 250px;
+}
+
+.ai-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,0.82);
+}
+
+.ai-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.75rem 1.25rem;
+    background: var(--teal-600);
+}
+
+.ai-panel-header span {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.ai-badge {
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.9);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ai-body {
+    padding: 1.25rem;
+}
+
+.ai-insight {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.ai-dot {
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: var(--teal-400);
+}
+
+.ai-text {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.empty-state {
+    padding: 1rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-soft);
+    background: rgba(255,255,255,0.56);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+    .main {
+        padding: 1rem;
+    }
+
+    .hero {
+        padding: 1.5rem 1rem 1.25rem;
+    }
+
+    .rank-bar-wrap {
+        display: none;
+    }
+
+    .profit-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+    <header class="hero">
+        <div class="hero-badge">
+            <span class="hero-dot"></span>
+            AI-Powered
+        </div>
+        <h1>Smart Agriculture<br><em>Crop Advisor</em></h1>
+        <p>Predict the most suitable crop for any region using soil nutrients, rainfall and live climate data.</p>
+
+        <div class="hero-stats">
+            <div class="hero-stat"><div class="num">22+</div><div class="lbl">Crop types</div></div>
+            <div class="hero-stat"><div class="num">7</div><div class="lbl">Input features</div></div>
+            <div class="hero-stat"><div class="num">AI</div><div class="lbl">ML model</div></div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section>
+            <div class="section-label">Region & Environmental Data</div>
+
+            <form class="card" action="/predict" method="post">
+                <div class="input-grid">
+                    <div class="field">
+                        <label for="location">Region / City</label>
+                        <input id="location" list="cities" name="location" placeholder="Enter city" value="{{ location if location else '' }}" required>
+                        <datalist id="cities">
+                            <option value="Chennai">
+                            <option value="Delhi">
+                            <option value="Mumbai">
+                            <option value="Bangalore">
+                            <option value="Coimbatore">
+                            <option value="Hyderabad">
+                            <option value="Kolkata">
+                            <option value="Pune">
+                        </datalist>
+                    </div>
+
+                    <div class="field">
+                        <label for="soil">Soil type</label>
+                        <select id="soil" name="soil">
+                            <option value="alluvial">Alluvial</option>
+                            <option value="black">Black / Regur</option>
+                            <option value="red">Red & Laterite</option>
+                            <option value="sandy">Sandy / Desert</option>
+                            <option value="clay">Clay</option>
+                            <option value="loamy">Loamy</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="season">Season</label>
+                        <select id="season" name="season">
+                            <option value="kharif">Kharif (Jun-Sep)</option>
+                            <option value="rabi">Rabi (Oct-Mar)</option>
+                            <option value="zaid">Zaid (Mar-Jun)</option>
+                            <option value="annual">Annual</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="input-grid">
+                    <div class="slider-field">
+                        <label for="n">Nitrogen (N) kg/ha</label>
+                        <div class="slider-row">
+                            <input id="n" type="range" name="n" min="0" max="150" value="50" oninput="n_out.textContent=this.value">
+                            <span class="slider-val" id="n_out">50</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-field">
+                        <label for="p">Phosphorus (P) kg/ha</label>
+                        <div class="slider-row">
+                            <input id="p" type="range" name="p" min="0" max="150" value="50" oninput="p_out.textContent=this.value">
+                            <span class="slider-val" id="p_out">50</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-field">
+                        <label for="k">Potassium (K) kg/ha</label>
+                        <div class="slider-row">
+                            <input id="k" type="range" name="k" min="0" max="150" value="50" oninput="k_out.textContent=this.value">
+                            <span class="slider-val" id="k_out">50</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-field">
+                        <label for="ph">Soil pH</label>
+                        <div class="slider-row">
+                            <input id="ph" type="range" name="ph" min="0" max="14" step="0.1" value="6.5" oninput="ph_out.textContent=this.value">
+                            <span class="slider-val" id="ph_out">6.5</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-field">
+                        <label for="rainfall">Annual Rainfall (mm)</label>
+                        <div class="slider-row">
+                            <input id="rainfall" type="range" name="rainfall" min="0" max="300" value="100" oninput="rain_out.textContent=this.value">
+                            <span class="slider-val" id="rain_out">100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="run-btn" type="submit">Predict Best Crops</button>
+            </form>
+        </section>
+
+        {% if result %}
+        <section>
+            <div class="section-label">AI Prediction Results</div>
+
+            <div class="top-crop">
+                <div class="top-crop-icon">{{ result[0]|upper }}</div>
+                <div class="top-crop-info">
+                    <div class="top-crop-tag">Top Recommendation</div>
+                    <div class="top-crop-name">{{ result }}</div>
+                    <div class="top-crop-score">Confidence score: {{ confidence }}%</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: {{ confidence }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="m-label">Location</div>
+                    <div class="m-value" style="font-size:14px;">{{ location }}</div>
+                </div>
+
+                <div class="metric">
+                    <div class="m-label">Temperature</div>
+                    <div class="m-value">{{ temp }}<span class="m-unit"> deg C</span></div>
+                </div>
+
+                <div class="metric">
+                    <div class="m-label">Humidity</div>
+                    <div class="m-value">{{ humidity }}<span class="m-unit">%</span></div>
+                </div>
+
+                <div class="metric">
+                    <div class="m-label">Profit</div>
+                    <div class="m-value" style="font-size:15px;">Rs. {{ profit }}</div>
+                </div>
+            </div>
+
+            <div class="tab-row">
+                <button class="tab active" type="button" onclick="switchTab(this,'rankings')">Rankings</button>
+                <button class="tab" type="button" onclick="switchTab(this,'profit')">Profitability</button>
+                <button class="tab" type="button" onclick="switchTab(this,'aiinsights')">AI Insights</button>
+            </div>
+
+            <div class="tab-panel active" id="tab-rankings">
+                <div class="card">
+                    <div class="crop-rankings">
+                        {% for crop,prob in top_crops %}
+                        <div class="crop-rank">
+                            <span class="rank-num">#{{ loop.index }}</span>
+                            <span class="rank-icon">{{ crop[0]|upper }}</span>
+
+                            <div class="rank-info">
+                                <div class="rank-name">{{ crop }}</div>
+                                <div class="rank-why">
+                                    {% if loop.index == 1 %}
+                                    Best environmental match
+                                    {% elif loop.index == 2 %}
+                                    Strong alternative crop
+                                    {% else %}
+                                    Suitable backup option
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="rank-bar-wrap">
+                                <div class="rank-bar" style="width: {{ prob }}%; background: {% if loop.index == 1 %}#3b6d11{% elif loop.index == 2 %}#639922{% else %}#5dcaa5{% endif %};"></div>
+                            </div>
+
+                            <span class="rank-score">{{ prob }}%</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-profit">
+                <div class="card">
+                    <div class="profit-grid">
+                        <div class="profit-card good">
+                            <div class="p-label">Est. Profit</div>
+                            <div class="p-val">Rs. {{ profit }}</div>
+                            <div class="p-note">model-based estimate</div>
+                        </div>
+
+                        <div class="profit-card warn">
+                            <div class="p-label">Market Risk</div>
+                            <div class="p-val" style="font-size:16px;">Medium</div>
+                            <div class="p-note">depends on local price</div>
+                        </div>
+
+                        <div class="profit-card good">
+                            <div class="p-label">Fit Score</div>
+                            <div class="p-val">{{ confidence }}%</div>
+                            <div class="p-note">crop suitability</div>
+                        </div>
+
+                        <div class="profit-card good">
+                            <div class="p-label">Recommendation</div>
+                            <div class="p-val" style="font-size:15px;">{{ result }}</div>
+                            <div class="p-note">best crop choice</div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="chart-wrap">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-aiinsights">
+                <div class="ai-panel">
+                    <div class="ai-panel-header">
+                        <span>AI Agronomist Insights</span>
+                        <span class="ai-badge">ML Model</span>
+                    </div>
+
+                    <div class="ai-body">
+                        <div class="ai-insight">
+                            <div class="ai-dot"></div>
+                            <div class="ai-text"><strong>{{ result }}</strong> is the strongest recommendation for the current soil nutrients and rainfall profile.</div>
+                        </div>
+
+                        <div class="ai-insight">
+                            <div class="ai-dot" style="background: var(--teal-200);"></div>
+                            <div class="ai-text">Weather data for <strong>{{ location }}</strong> was considered with temperature at <strong>{{ temp }} deg C</strong> and humidity at <strong>{{ humidity }}%</strong>.</div>
+                        </div>
+
+                        <div class="ai-insight">
+                            <div class="ai-dot" style="background: var(--amber-200);"></div>
+                            <div class="ai-text">Check local mandi prices, water availability and fertilizer cost before final cultivation planning.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+        const chartElement = document.getElementById("profitChart");
+
+        if (window.Chart && chartElement) {
+            new Chart(chartElement, {
+                type: "bar",
+                data: {
+                    labels: [{% for crop,prob in top_crops %}{{ crop | tojson }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    datasets: [{
+                        label: "Fit score (%)",
+                        data: [{% for crop,prob in top_crops %}{{ prob | float }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                        backgroundColor: ["#3b6d11", "#639922", "#5dcaa5", "#ef9f27", "#888780"],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: "top",
+                            labels: {
+                                boxWidth: 10,
+                                padding: 16,
+                                font: { family: "Outfit", size: 11 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: "Outfit", size: 11 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: "rgba(0,0,0,0.05)" },
+                            ticks: {
+                                font: { family: "Outfit", size: 11 },
+                                callback: value => value + "%"
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        </script>
+
+        {% else %}
+        <section>
+            <div class="section-label">AI Prediction Results</div>
+            <div class="empty-state">
+                Enter your region and soil values, then click Predict Best Crops. Your recommendation, ranking, profit estimate and AI insights will appear here.
+            </div>
+        </section>
+        {% endif %}
+    </main>
+</div>
+
+<script>
+function switchTab(button, panelId) {
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById("tab-" + panelId).classList.add("active");
+}
+</script>
+</body>
+</html>
