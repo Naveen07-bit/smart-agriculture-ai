@@ -1,21 +1,430 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AgriNexus Intelligence</title>
+    <style>
+        :root {
+            --bg: #07110d;
+            --surface: #101b16;
+            --surface-2: #16251e;
+            --surface-3: #20362b;
+            --text: #f7fbf8;
+            --muted: #aebdb4;
+            --soft: #dfe9e2;
+            --line: rgba(255, 255, 255, 0.12);
+            --accent: #25c46b;
+            --accent-dark: #0f7d42;
+            --gold: #f2c94c;
+            --danger: #ff7171;
+            --shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background:
+                linear-gradient(rgba(7, 17, 13, 0.74), rgba(7, 17, 13, 0.84)),
+                url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1800&q=80") center / cover fixed;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 16% 12%, rgba(37, 196, 107, 0.2), transparent 26rem),
+                radial-gradient(circle at 86% 78%, rgba(242, 201, 76, 0.12), transparent 24rem);
+        }
+
+        .page {
+            position: relative;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .brand-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 26px clamp(20px, 5vw, 68px);
+        }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #b7f4c3);
+            color: #062012;
+            font-weight: 900;
+            box-shadow: 0 0 0 8px rgba(37, 196, 107, 0.13);
+        }
+
+        .brand-title,
+        .brand-subtitle {
+            margin: 0;
+        }
+
+        .brand-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 0.86rem;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 36px;
+            padding: 0 14px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(16, 27, 22, 0.72);
+            color: var(--soft);
+            font-size: 0.84rem;
+            backdrop-filter: blur(16px);
+        }
+
+        .status-pill::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 5px rgba(37, 196, 107, 0.13);
+        }
+
+        .login-shell {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto 48px;
+            align-self: center;
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(16, 27, 22, 0.9);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(22px);
+        }
+
+        .insight-panel {
+            position: relative;
+            min-height: 620px;
+            padding: 0;
+            border-right: 1px solid var(--line);
+            overflow: hidden;
+            background: var(--surface-2);
+        }
+
+        .harvest-photo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(1.08) contrast(1.03);
+        }
+
+        .insight-panel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(5, 16, 10, 0.08), rgba(5, 16, 10, 0.72)),
+                linear-gradient(90deg, rgba(5, 16, 10, 0.34), rgba(5, 16, 10, 0.04));
+        }
+
+        .harvest-caption {
+            position: absolute;
+            left: clamp(24px, 5vw, 48px);
+            right: clamp(24px, 5vw, 48px);
+            bottom: clamp(24px, 5vw, 46px);
+            z-index: 1;
+            display: grid;
+            gap: 14px;
+        }
+
+        .harvest-badge {
+            width: fit-content;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 999px;
+            background: rgba(7, 17, 12, 0.54);
+            color: #f7fbf8;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            backdrop-filter: blur(12px);
+        }
+
+        .harvest-caption h1 {
+            margin: 0;
+            max-width: 11ch;
+            font-size: clamp(2.35rem, 5vw, 4.45rem);
+            line-height: 0.98;
+            text-shadow: 0 10px 36px rgba(0, 0, 0, 0.42);
+        }
+
+        .harvest-thought {
+            max-width: 520px;
+            margin: 0;
+            padding: 16px 18px;
+            border-left: 4px solid var(--gold);
+            border-radius: 8px;
+            background: rgba(7, 17, 12, 0.52);
+            color: var(--soft);
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.55;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-panel {
+            display: flex;
+            align-items: center;
+            padding: clamp(30px, 5vw, 58px);
+            background: rgba(12, 22, 17, 0.95);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 410px;
+            margin: 0 auto;
+        }
+
+        .login-card h2 {
+            margin: 0 0 8px;
+            font-size: 2.15rem;
+        }
+
+        .login-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.58;
+        }
+
+        .error {
+            margin-top: 18px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 113, 113, 0.38);
+            border-radius: 8px;
+            background: rgba(255, 113, 113, 0.1);
+            color: #ffb1b1;
+            font-size: 0.92rem;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        input {
+            width: 100%;
+            min-height: 52px;
+            margin-bottom: 18px;
+            padding: 0 15px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            outline: none;
+            background: rgba(7, 15, 11, 0.82);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        input::placeholder {
+            color: #748379;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            background: #081510;
+            box-shadow: 0 0 0 4px rgba(37, 196, 107, 0.15);
+        }
+
+        button {
+            width: 100%;
+            min-height: 54px;
+            border: 0;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), #8ee88c);
+            color: #052012;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 900;
+            box-shadow: 0 16px 34px rgba(37, 196, 107, 0.22);
+        }
+
+        button:hover {
+            filter: brightness(1.04);
+            box-shadow: 0 20px 42px rgba(37, 196, 107, 0.28);
+            transform: translateY(-1px);
+        }
+
+        .form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 0.84rem;
+            text-align: center;
+        }
+
+        .form-footer::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+        }
+
+        @media (max-width: 900px) {
+            .brand-bar {
+                padding: 22px 20px;
+            }
+
+            .status-pill {
+                display: none;
+            }
+
+            .login-shell {
+                grid-template-columns: 1fr;
+                margin-bottom: 28px;
+            }
+
+            .insight-panel {
+                min-height: 420px;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .harvest-caption h1 {
+                max-width: 13ch;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .brand-subtitle {
+                display: none;
+            }
+
+            .login-shell {
+                width: min(100% - 24px, 1120px);
+            }
+
+            .form-panel {
+                padding: 26px 20px;
+            }
+
+            .insight-panel {
+                min-height: 360px;
+            }
+
+            .harvest-caption {
+                left: 20px;
+                right: 20px;
+                bottom: 22px;
+            }
+
+            .harvest-caption h1 {
+                font-size: 2.25rem;
+            }
+
+            .harvest-thought {
+                padding: 14px 15px;
+                font-size: 0.92rem;
+            }
+
+            .login-card h2 {
+                font-size: 1.85rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <main class="page">
+        <header class="brand-bar">
+            <div class="brand-lockup">
+                <div class="logo" aria-hidden="true">AN</div>
+                <div>
+                    <p class="brand-title">AgriNexus Intelligence</p>
+                    <p class="brand-subtitle">AI crop yield analytics for Indian regions</p>
+                </div>
+            </div>
+            <div class="status-pill">Live regional models</div>
+        </header>
 
-<h2>Login</h2>
+        <section class="login-shell" aria-label="AgriNexus login">
+            <div class="insight-panel">
+                <img class="harvest-photo" src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=1200&q=80" alt="Indian crop field during harvest season">
+                <div class="harvest-caption">
+                    <span class="harvest-badge">Indian harvest intelligence</span>
+                    <h1>From sowing to harvest.</h1>
+                    <p class="harvest-thought">Every harvest begins with patience, care, and one brave seed in the soil.</p>
+                </div>
+            </div>
 
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
+            <div class="form-panel">
+                <div class="login-card">
+                    <h2>Welcome back</h2>
+                    <p>Sign in to continue monitoring crop yield predictions and risk alerts.</p>
 
-<form method="post">
-    <input type="text" name="username" placeholder="Username" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit">Login</button>
-</form>
+                    {% if error %}
+                    <div class="error">{{ error }}</div>
+                    {% endif %}
 
+                    <form method="post">
+                        <label for="username">Username</label>
+                        <input id="username" type="text" name="username" placeholder="Enter username" autocomplete="username" required>
+
+                        <label for="password">Password</label>
+                        <input id="password" type="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+
+                        <button type="submit">Login to dashboard</button>
+                    </form>
+
+                    <p class="form-footer">Secure access for crop intelligence teams</p>
+                </div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
